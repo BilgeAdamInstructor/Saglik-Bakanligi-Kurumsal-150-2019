@@ -1,0 +1,80 @@
+﻿<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous"></script>
+
+<input type="button" value="tokenı al" onclick="getToken();" />
+<br />
+<input type="button" value=" token gönder values al" onclick="getValues();" />
+<br />
+
+
+<input type="text" value="" id="Token" />
+<script>
+    window.Token = null;
+    //http://test-jwt.hazir.net/users //tokenı al
+    // http://test-jwt.hazir.net/users/authenticate
+
+
+    function getToken() {
+        $.ajax({
+            type: 'post',
+            url: 'http://test-jwt.hazir.net/users/authenticate ',
+            data: '{username: "test", password: "123456"}',
+            contentType: 'application/json',
+            success: function (resultData) {
+                window.Token = resultData.token;
+                $("#Token").val(resultData.token);
+            },
+            error: function (resultData) {
+                console.log(resultData);
+            }
+        });
+    }
+
+    function getValues() {
+        $.ajax({
+            type: 'GET',
+            url: 'http://test-jwt.hazir.net/users',
+
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Authorization", "Bearer " + window.Token);// values alanına ulaşırken token ı eklemiş oldukç.
+            },
+            data: {},
+            success: function (data) {
+                $.each(data, function (i) {
+                    console.log(data[i]);
+                })
+
+                for (var i = 0; i < data.length; i++) {
+                    postValues(data[i]);
+                }
+            },
+
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+
+
+    function postValues(data) {
+        console.log(data);
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/api/user',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Authorization", "Bearer " + window.Token);
+            },
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: function (data) {
+                console.log(data);
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+
+</script>
