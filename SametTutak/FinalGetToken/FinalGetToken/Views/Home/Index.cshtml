@@ -1,0 +1,136 @@
+﻿<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous">
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+
+
+<div class="container register-form">
+    <div class="form">
+        <div class="note">
+            <p>BİLGE ADAM FINAL EXAM...</p>
+        </div>
+        <div class="form-content">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Get Token Please.." id="Token" />
+                    </div>
+                </div>
+            </div>
+            <button type="button" onclick="GetToken();" class="btnSubmit">GetToken</button>
+            <button type="button" onclick="GetValues();" class="btnSubmit">GetValues</button>
+            <button type="button" onclick="SendValuesApi();" class="btnSubmit">SendValueApi</button>
+            <button type="button" onclick="GetUsers();" class="btnSubmit">GetUsers</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .note {
+        text-align: center;
+        height: 80px;
+        background: -webkit-linear-gradient(left, #0072ff, #8811c5);
+        color: #fff;
+        font-weight: bold;
+        line-height: 80px;
+    }
+
+    .form-content {
+        padding: 5%;
+        border: 1px solid #ced4da;
+        margin-bottom: 2%;
+    }
+
+    .form-control {
+        border-radius: 1.5rem;
+    }
+
+    .btnSubmit {
+        border: none;
+        border-radius: 1.5rem;
+        padding: 1%;
+        width: 20%;
+        cursor: pointer;
+        background: #0062cc;
+        color: #fff;
+        margin-right: 20;
+        margin-left: 20;
+        margin-top: 20;
+    }
+</style>
+
+
+
+<script>
+    var users = new Object();
+    window.Token = null;
+    function GetToken() {
+        $.ajax({
+            type: 'POST',
+            url: 'http://test-jwt.hazir.net/users/authenticate',
+            data: '{"username":"test","password":"123456"}',
+            contentType: 'application/json',
+            success: function (resultData) {
+                window.Token = resultData.token;
+                $('#Token').val(resultData.token);
+            },
+            error: function (resultData) {
+                consonle.log(resultData);
+            }
+        });
+    }
+    function GetValues() {
+        $.ajax({
+            type: 'GET',
+            url: 'http://test-jwt.hazir.net/users/',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Authorization", "Bearer " + window.Token);
+            },
+            data: {},
+            contentType: 'application/json',
+            success: function (data) {
+                users = data;
+                console.log(data);
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+    function GetUsers() {
+        $.ajax({
+            type: 'GET',
+            url: 'http://localhost:5005/api/values',
+            data: {},
+            contentType: 'application/json',
+            success: function (data) {
+                users = data;
+                console.log("users", data);
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+    function SendValuesApi() {
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5005/api/values',
+            data: JSON.stringify(users),
+            contentType: 'application/json',
+            success: function (data) {
+                console.log(data);
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+</script>
