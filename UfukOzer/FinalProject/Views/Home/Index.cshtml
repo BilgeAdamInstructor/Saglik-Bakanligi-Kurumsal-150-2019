@@ -1,0 +1,62 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous"></script>
+<input type="button" value="Tokeni Al" onclick="getToken();" />
+<br />
+<input type="button" value="Tokeni Gönder, Values Al" onclick="getValues();" />
+<br />
+<input type="text" value="" id="Token" />
+<br />
+<input type="button" value="Bilgileri Kaydet" onclick="sendData();" />
+<script>
+    var jDto = new Object();
+    window.Token = null;
+    function getToken() {
+        $.ajax({
+            type: 'POST',
+            url: 'http://test-jwt.hazir.net/users/authenticate',
+            data: '{username: "test", password: "123456"}',
+            contentType: 'application/json',
+            success: function (resultData) {
+                window.Token = resultData["token"];
+                $("#Token").val(resultData["token"]);
+            },
+            error: function (resultData) {
+                console.log(resultData);
+            }
+        });
+    }
+    function getValues() {
+        $.ajax({
+            type: 'GET',
+            url: 'http://test-jwt.hazir.net/users/',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Authorization", "Bearer " + window.Token);
+            },
+            data: {},
+            success: function (data) {
+                console.log(data);
+                jDto = data;
+                console.log(jDto);
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+    function sendData() {
+        console.log("gödnerilen:" + JSON.stringify(jDto));
+        $.ajax({
+            type: 'POST',
+            url: '/api/user/index',
+            data: JSON.stringify(jDto),
+            success:
+                console.log(jDto),
+            contentType: 'application/json'
+        });
+    }
+</script>
