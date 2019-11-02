@@ -1,0 +1,110 @@
+﻿@{
+    Layout = null;
+}
+<script src="https://code.jquery.com/jquery-3.4.1.js"
+        integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+        crossorigin="anonymous"></script>
+<div class="row">
+    <button class="btn" onclick="getToken();"> Token Al </button>
+    <button class="btn" onclick="getUsers();"> Api'den Kullanıcıları Çek </button>
+    <button class="btn btn-primary" onclick="postUsers();"> Kullaniciları Veritabanına Ekle </button>
+    <button class="btn btn-primary" onclick="getAllUsers();"> Veritabanından Kullanıcıları Çek </button>
+</div>
+<br>
+<div class="row">
+    <br>
+    <div id="InsertResult"></div>
+</div>
+<div class="row">
+    <br>
+    <div id="GetAllUsersResult"></div>
+</div>
+<script>
+
+    var Resultdata = new Object();
+    var getToken = function () {
+        $.ajax({
+            dataType: "json",
+            contentType: "application/json",
+            type: 'POST',
+            url: 'http://test-jwt.hazir.net/users/authenticate',
+            data: JSON.stringify({ username: 'test', password: '123456' }),
+            success: function (resultData) {
+                if (!resultData) {
+                    alert("Token Alırken Hata Oluştu.");
+                } else {
+                    Resultdata = resultData;
+                    alert("Token Başarıyla Alındı. Kullanıcıları Çekebilirsiniz.");
+                }
+            }
+        });
+    }
+
+    var allUsers = new Object();
+    var getUsers = function () {
+        if (Resultdata.token == null) {
+            alert("Kullanıcıları çekebilmek için öncelikle Token Almalısınız.!");
+            return;
+        }
+
+        $.ajax({
+            type: 'GET',
+            url: 'http://test-jwt.hazir.net/users',
+            headers: { "Authorization": "BEARER " + Resultdata.token },
+            dataType: 'json',
+            contentType: "application/json",
+            success: function (data) {
+                console.log('succes: ' + data);
+                if (!data) {
+                    alert("Kullanicilari Çekerken Hata Oluştu.");
+                } else {
+                    allUsers = data;
+                    alert("Kullanıcılar Başarıyla Çekildi.");
+                }
+            }
+        });
+    }
+
+    var postUsers = function () {
+
+        if (typeof allUsers.length == 'undefined') {
+            alert("Kaydedilecek Kullanici Bulunamadı. Öncelikle Kullanicilari Çekmelisiniz..!");
+            return;
+        }
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            contentType: "application/json",
+            url: 'http://localhost:5001/api/Users',
+            data: JSON.stringify(allUsers),
+            success: function (resultData) {
+                $("#InsertResult").html("Sonuç  : " + JSON.stringify(resultData));
+                alert("Sonuç ekranda!");
+            }
+        });
+    }
+
+
+    var getAllUsers = function () {
+
+        $.ajax({
+            type: 'GET',
+            url: 'http://localhost:5001/api/Users',
+            dataType: 'json',
+            contentType: "application/json",
+            success: function (data) {
+                console.log('succes: ' + data);
+                if (!data) {
+                    alert("Veritabanından Kullanicilari Çekerken Hata Oluştu.");
+                } else {
+                    $("#GetAllUsersResult").html("Kullanıcılar: " + JSON.stringify(data));
+                    alert("Kullanıcılar Başarıyla Çekildi.");
+                }
+            }
+        });
+
+    }
+
+</script>
+
+
