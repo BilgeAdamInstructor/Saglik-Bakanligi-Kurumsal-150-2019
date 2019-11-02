@@ -1,0 +1,19 @@
+﻿@{
+    Layout = null;
+}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous"></script>
+<script src="~/js/custom.js"></script>
+
+<input type="button" name="name" value="Token Al" onclick="util.getToken();" />
+<br />
+<br />
+<input type="button" name="name" value="Token gönder, tüm kullanıcıları getir" onclick="util.getValues();" />
+<br />
+<input type="text" name="name" value="" id="Token" />
+
+<script>
+    window.Token = null;
+    var obj = new Object();
+</script>
