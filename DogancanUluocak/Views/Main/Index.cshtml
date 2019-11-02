@@ -1,0 +1,102 @@
+﻿<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous">
+</script> @*Yukarıda JQuery kütüphanesi projeye dahil edilmiştir.*@
+
+<input type="button" value="Token Al" onclick="getToken();" />
+<br />
+<input type="button" value="Value Al" onclick="getValues();" />
+<br />
+<input type="text" value="" id="Token" />
+<br />
+<input type="button" value="Verileri Sunucuya Gönder" onclick="sendUsersToServer();" />
+<br />
+<input type="button" value="Kişileri Getir" onclick="getJsonUsers();" />
+<hr />
+<input type="text" value="" id="idWillDelete" />
+<input type="button" value="Id'li Veriyi Sil" onclick="deleteFromId();" />
+
+<script>
+    var users = new Object();
+    window.Token = null;
+    var selectedId = null;
+    function getToken() {
+        $.ajax({
+            type: 'POST',
+            url: 'http://test-jwt.hazir.net/users/authenticate',
+            data: '{"username":"test","password":"123456"}',
+            contentType: 'application/json',
+            success: function (resultData) {
+                window.Token = resultData.token;
+                $('#Token').val(resultData.token);
+            },
+            error: function (resultData) {
+                console.log(resultData);
+            }
+        });
+    }
+    function getValues() {
+        $.ajax({
+            type: 'GET',
+            url: 'http://test-jwt.hazir.net/users/',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Authorization", "Bearer " + window.Token);
+            },
+            data: {},
+            contentType: 'application/json',
+            success: function (data) {
+                users = data;
+                console.log(data);
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+    function sendUsersToServer() {
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/api/values',
+            contentType: 'application/json',
+            data: JSON.stringify(users),
+            success: function (data) {
+                console.log(JSON.stringify(users));
+                console.log(data);
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+    function getJsonUsers() {
+        $.ajax({
+            type: 'GET',
+            url: 'http://localhost:5000/api/values',
+            contentType: 'application/json',
+            data: {},
+            success: function (data) {
+                console.log(data);
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+
+    function deleteFromId() {
+        selectedId = $("#idWillDelete").val();
+        $.ajax({
+            type: 'DELETE',
+            url: 'http://localhost:5000/api/values/' + selectedId,
+            contentType: 'application/json',
+            data: {},
+            success: function (data) {
+                console.log(selectedId +" kayıt silindi.");
+                console.log(data);
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+</script>
